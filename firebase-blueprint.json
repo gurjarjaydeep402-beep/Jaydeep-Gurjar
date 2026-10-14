@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile, settings, credits, and workspace state in Astra Forge",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth user ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Display name or handle" },
+        "photoURL": { "type": "string", "description": "Avatar photo URL" },
+        "plan": { "type": "string", "description": "Current subscription plan (e.g. Free, Pro, Enterprise)" },
+        "credits": { "type": "number", "description": "Remaining AI generation credits" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of account creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "UserProject": {
+      "title": "UserProject",
+      "description": "Saved project or workflow belonging to an authenticated user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Project ID" },
+        "userId": { "type": "string", "description": "Owning user UID" },
+        "name": { "type": "string", "description": "Project title" },
+        "category": { "type": "string", "description": "Workspace category (e.g. code, app, image, audio)" },
+        "data": { "type": "string", "description": "Serialized project payload or state" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Update timestamp" }
+      },
+      "required": ["id", "userId", "name", "createdAt"]
+    },
+    "CreditTransaction": {
+      "title": "CreditTransaction",
+      "description": "Ledger entry tracking credit deduction or addition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction ID" },
+        "userId": { "type": "string", "description": "User UID" },
+        "action": { "type": "string", "description": "Action performed" },
+        "amount": { "type": "number", "description": "Credits delta" },
+        "timestamp": { "type": "number", "description": "Epoch timestamp" },
+        "provider": { "type": "string", "description": "Service provider" },
+        "status": { "type": "string", "description": "Transaction status" }
+      },
+      "required": ["id", "action", "amount", "timestamp"]
+    },
+    "PromoRedemption": {
+      "title": "PromoRedemption",
+      "description": "Voucher activation log containing user name and telephone data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Redemption ID" },
+        "userName": { "type": "string", "description": "User full name" },
+        "phoneNumber": { "type": "string", "description": "User contact number" },
+        "code": { "type": "string", "description": "Promo code redeemed" },
+        "creditsGranted": { "type": "number", "description": "Credits granted" },
+        "timestamp": { "type": "number", "description": "Epoch timestamp" }
+      },
+      "required": ["id", "userName", "code", "creditsGranted", "timestamp"]
+    },
+    "SystemConfig": {
+      "title": "SystemConfig",
+      "description": "Owner-only configuration, feature flags, and checkpoints",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Config ID" },
+        "key": { "type": "string", "description": "Configuration key" },
+        "value": { "type": "string", "description": "Encrypted or serialized config" },
+        "updatedAt": { "type": "string", "description": "Update timestamp" }
+      },
+      "required": ["id", "key", "value", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User private profile document"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": "UserProject",
+      "description": "User private projects collection"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "CreditTransaction",
+      "description": "User private ledger transactions"
+    },
+    "/redemptions/{redemptionId}": {
+      "schema": "PromoRedemption",
+      "description": "Admin promo code activation log"
+    },
+    "/system/{documentId}": {
+      "schema": "SystemConfig",
+      "description": "Owner-only system parameters and checkpoints"
+    }
+  }
+}

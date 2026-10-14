@@ -1,0 +1,7 @@
+{
+  "name": "ASTRA - AI Pro Assistant",
+  "description": "Your AI assistant, creative partner, and personal productivity engine. Build, create, automate, and explore infinite possibilities with ASTRA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

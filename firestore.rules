@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper authorization functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isDocOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAppOwner() {
+      return isAuthenticated() && (
+        request.auth.token.email == "gurjarjaydeep402@gmail.com" ||
+        (request.auth.token.email != null && request.auth.token.email.matches('.*gurjar.*'))
+      );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        isAppOwner() ||
+        (request.auth.token.role != null && request.auth.token.role == "ADMIN")
+      );
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow read: if isDocOwner(userId) || isAppOwner();
+      allow create: if isDocOwner(userId) && request.resource.data.uid == userId;
+      allow update: if isDocOwner(userId) && request.resource.data.uid == userId;
+      allow delete: if isAppOwner();
+
+      // User projects collection
+      match /projects/{projectId} {
+        allow read, write: if isDocOwner(userId) || isAppOwner();
+      }
+
+      // User transactions collection
+      match /transactions/{transactionId} {
+        allow read: if isDocOwner(userId) || isAppOwner();
+        allow create: if isDocOwner(userId) || isAppOwner();
+        allow update, delete: if isAppOwner();
+      }
+    }
+
+    // Promo code activation redemptions collection
+    match /redemptions/{redemptionId} {
+      allow create: if true;
+      allow read: if isAdmin() || isAppOwner();
+      allow update, delete: if isAppOwner();
+    }
+
+    // Owner-only system parameters, checkpoints, and secrets
+    match /system/{documentId} {
+      allow read, write: if isAppOwner();
+    }
+  }
+}
